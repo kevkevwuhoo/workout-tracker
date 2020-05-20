@@ -20,21 +20,16 @@ mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost/workout", {
 });
 
 // Routes
-app.get("/api/workouts", async (req, res) => {
-  try {
-    const allWorkouts = await db.Workout.find({});
-    res.json(allWorkouts);
-  } catch (err) {
-    res.json(err);
-  }
+app.get("/api/workouts", (req, res) => {
+  db.Workout.find({}, (err, data) => {
+    if (err) {
+      console.log(err);
+    } else {
+      res.json(data);
+    }
+  });
 });
 
-// app.put("/api/workouts", async (req, res) => {
-//   try {
-//     const newExercise = await db.Workout.update(req.body);
-//     res.json(newExercise);
-//   }
-// })
 app.put("/api/workouts/:id", (req, res) => {
   db.Workout.update(
     { _id: req.params.id },

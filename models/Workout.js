@@ -22,6 +22,7 @@ const WorkoutSchema = new Schema({
       duration: {
         type: Number,
         trim: true,
+        required: "Exercise Duration is Required",
       },
       weight: {
         type: Number,
@@ -40,8 +41,18 @@ const WorkoutSchema = new Schema({
         trim: true,
       }
     }
-  ]
+  ],
+  totalDuration: Number,
 });
+
+WorkoutSchema.methods.calculateTotalDuration = () => {
+  let total = 0;
+  this.exercises.forEach((exercise) => {
+    total += exercise.duration;
+  });
+  this.totalDuration = total;
+  return this.totalDuration;
+};
 
 const Workout = mongoose.model("Workout", WorkoutSchema);
 
