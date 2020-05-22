@@ -46,7 +46,9 @@ app.get("/api/workouts", (req, res) => {
 });
 
 app.get("/api/workouts/range", (req, res) => {
-  db.Workout.find({}, (err, data) => {
+  const startDate = new Date().setDate(new Date().getDate()-7);
+  db.Workout.find({day: {$gte: startDate}}, (err, data) => {
+  // db.Workout.find({}, (err, data) => {
     if (err) {
       console.log(err);
     } else {
@@ -55,20 +57,17 @@ app.get("/api/workouts/range", (req, res) => {
   });
 });
 
-app.put("/api/workouts/:id", (req, res) => {
-  db.Workout.update(
-    { _id: req.params.id },
-    {
-      $push: { exercises: req.body },
-    },
-    (err, data) => {
-      if (err) {
-        console.log(err);
-      } else {
-        res.json(data);
-      }
-    }
-  );
+app.put("/api/workouts/:id", async (req, res) => {
+  try {
+    const currentWorkout = await db.Workout.findOne({
+      _id: req.params.id,
+    });
+
+    const savedWorkout = await currentWorkout.addExercise(req.body);
+    res.json(savedWorkout);
+  } catch (err) {
+    throw err;
+  }
 });
 
 app.post("/api/workouts", (req,res) => {
