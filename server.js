@@ -35,26 +35,24 @@ app.get("/stats", (req,res) => {
 });
 
 // *** API ***
-app.get("/api/workouts", (req, res) => {
-  db.Workout.find().sort({day: 1}).exec((err, data) => {
-    if (err) {
-      console.log(err);
-    } else {
-      res.json(data);
-    }
-  });
+app.get("/api/workouts", async (req, res) => {
+  try {
+    const allWorkouts = await db.Workout.find().sort({day: 1});
+    res.json(allWorkouts);
+  } catch (err) {
+    throw err;
+  }
 });
 
-app.get("/api/workouts/range", (req, res) => {
-  const startDate = new Date().setDate(new Date().getDate()-7);
-  db.Workout.find({day: {$gte: startDate}}, (err, data) => {
-  // db.Workout.find({}, (err, data) => {
-    if (err) {
-      console.log(err);
-    } else {
-      res.json(data);
-    }
-  });
+app.get("/api/workouts/range", async (req, res) => {
+  try {
+    const startDate = new Date().setDate(new Date().getDate()-7);
+    const rangeWorkouts = await db.Workout.find({day: {$gte: startDate}});
+    res.json(rangeWorkouts);
+  } catch (err) {
+    throw err;
+  }
+
 });
 
 app.put("/api/workouts/:id", async (req, res) => {
@@ -70,16 +68,14 @@ app.put("/api/workouts/:id", async (req, res) => {
   }
 });
 
-app.post("/api/workouts", (req,res) => {
-  db.Workout.create(req.body,
-    (err, data) => {
-      if (err) {
-        console.log(err);
-      } else {
-        res.json(data);
-      }
-    }
-  );
+app.post("/api/workouts", async (req,res) => {
+  try {
+    const newWorkout = await db.Workout.create(req.body);
+    res.json(newWorkout);
+  } catch (err) {
+    throw err;
+  }
+
 });
 
 // Start the server
