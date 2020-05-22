@@ -11,7 +11,7 @@ const WorkoutSchema = new Schema({
       type: {
         type: String,
         trim: true,
-        enum: ["Cardio", "Resistance"],
+        enum: ["cardio", "resistance"],
         required: "Exercise type must be Cardio or Resistance"
       },
       name: {
@@ -45,13 +45,19 @@ const WorkoutSchema = new Schema({
   totalDuration: Number,
 });
 
-WorkoutSchema.methods.calculateTotalDuration = () => {
+WorkoutSchema.methods.calculateTotalDuration = function () {
   let total = 0;
   this.exercises.forEach((exercise) => {
     total += exercise.duration;
   });
   this.totalDuration = total;
   return this.totalDuration;
+};
+
+WorkoutSchema.methods.addExercise = function (exercise) {
+  this.exercises.push(exercise);
+  this.calculateTotalDuration();
+  return this.save();
 };
 
 const Workout = mongoose.model("Workout", WorkoutSchema);
